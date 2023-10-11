@@ -4,15 +4,34 @@ class CameraApp extends Component {
   state = {
     stream: null,
     activeCamera: "user", // 'user' for front, 'environment' for rear
+    error: null,
   };
+
+  videoRef = React.createRef();
 
   async getCameraStream() {
     try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter(
+        (device) => device.kind === "videoinput"
+      );
+
+      if (videoDevices.length === 0) {
+        this.setState({ error: "No cameras found" });
+        return;
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: this.state.activeCamera },
       });
-      this.setState({ stream });
+
+      this.setState({ stream, error: null }, () => {
+        if (this.videoRef.current) {
+          this.videoRef.current.srcObject = stream;
+        }
+      });
     } catch (error) {
+      this.setState({ error: "Error accessing camera" });
       console.error("Error accessing camera:", error);
     }
   }
@@ -43,13 +62,19 @@ class CameraApp extends Component {
   }
 
   render() {
-    const { stream } = this.state;
+    const { stream, error } = this.state;
 
     return (
       <div>
         <h1>Camera App</h1>
-        <button onClick={this.toggleCamera}>Switch Camera</button>
-        {stream && <video autoPlay ref={(video) => (this.video = video)} />}
+        {error ? (
+          <p>{error}</p>
+        ) : (
+          <div>
+            <button onClick={this.toggleCamera}>Switch Camera</button>
+            {stream && <video autoPlay ref={this.videoRef} />}
+          </div>
+        )}
       </div>
     );
   }
