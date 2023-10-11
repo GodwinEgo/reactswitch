@@ -1,9 +1,11 @@
-const App = () => {
-    return (
-        <div>
-            APP gg
-        </div>
-    )
-}
+import CameraApp from "./CameraApp";
 
-export default App
+const App = () => {
+  return (
+    <div>
+      <CameraApp />
+    </div>
+  );
+};
+
+export default App;
