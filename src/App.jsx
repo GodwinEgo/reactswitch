@@ -1,7 +1,7 @@
 const App = () => {
     return (
         <div>
-            APP
+            APP gg
         </div>
     )
 }
